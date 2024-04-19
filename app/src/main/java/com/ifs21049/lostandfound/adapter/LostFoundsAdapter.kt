@@ -1,5 +1,9 @@
 package com.ifs21049.lostandfound.adapter
 
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -55,7 +59,22 @@ class LostFoundsAdapter :
             binding.apply {
                 tvItemLostFoundTitle.text = data.title
                 cbItemLostFoundIsFinished.isChecked = data.isCompleted == 1
+
+                val statusText = if (data.status.equals("found", ignoreCase = true)) {
+                    highlightText("Found", Color.GREEN)
+                } else {
+                    highlightText("Lost", Color.RED)
+                }
+                // Menetapkan teks status yang sudah disorot ke TextView
+                tvLostFoundDetailStatus.text = statusText
             }
+        }
+
+        private fun highlightText(text: String, color: Int): SpannableString {
+            val spannableString = SpannableString(text)
+            val foregroundColorSpan = ForegroundColorSpan(color)
+            spannableString.setSpan(foregroundColorSpan, 0, text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            return spannableString
         }
     }
 

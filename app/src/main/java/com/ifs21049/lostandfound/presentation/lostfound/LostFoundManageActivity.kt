@@ -4,10 +4,11 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.ifs21049.lostandfound.R
 import com.ifs21049.lostandfound.data.model.DelcomLostFound
 import com.ifs21049.lostandfound.data.remote.MyResult
 import com.ifs21049.lostandfound.databinding.ActivityLostFoundManageBinding
@@ -31,6 +32,26 @@ class LostFoundManageActivity : AppCompatActivity() {
 
     private fun setupView() {
         showLoading(false)
+
+        binding.btnLostFoundImage.setOnClickListener {
+            // Membuat intent untuk memilih gambar dari galeri
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.type = "image/*"
+
+            // Memulai activity untuk memilih gambar dari galeri
+            launcher.launch(intent)
+        }
+    }
+
+    private val launcher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val selectedImageUri = result.data?.data
+            // Lakukan sesuatu dengan URI gambar yang dipilih
+            // Misalnya, tampilkan gambar tersebut di ImageView
+            binding.ivSelectedImage.setImageURI(selectedImageUri)
+        }
     }
 
     private fun setupAtion() {
@@ -70,23 +91,12 @@ class LostFoundManageActivity : AppCompatActivity() {
             btnLostFoundManageSave.setOnClickListener {
                 val title = etLostFoundManageTitle.text.toString()
                 val description = etLostFoundManageDesc.text.toString()
-                val status = etLostFoundManageStatus.text.toString()
+                val status = etLostFoundManageStatus.selectedItem.toString()
 
                 if (title.isEmpty() || description.isEmpty() || status.isEmpty()) {
                     AlertDialog.Builder(this@LostFoundManageActivity).apply {
                         setTitle("Oh No!")
                         setMessage("Tidak boleh ada data yang kosong!")
-                        setPositiveButton("Oke") { _, _ -> }
-                        create()
-                        show()
-                    }
-                    return@setOnClickListener
-                }
-
-                if (status != "lost" && status != "found") {
-                    AlertDialog.Builder(this@LostFoundManageActivity).apply {
-                        setTitle("Oh No!")
-                        setMessage("Status hanya dapat berupa 'lost' atau 'found'!")
                         setPositiveButton("Oke") { _, _ -> }
                         create()
                         show()
@@ -135,12 +145,15 @@ class LostFoundManageActivity : AppCompatActivity() {
 
             etLostFoundManageTitle.setText(lostfound.title)
             etLostFoundManageDesc.setText(lostfound.description)
-            etLostFoundManageStatus.setText(lostfound.status)
+
+            val statusArray = resources.getStringArray(R.array.status)
+            val statusIndex = statusArray.indexOf(lostfound.status)
+            etLostFoundManageStatus.setSelection(statusIndex)
 
             btnLostFoundManageSave.setOnClickListener {
                 val title = etLostFoundManageTitle.text.toString()
                 val description = etLostFoundManageDesc.text.toString()
-                val status = etLostFoundManageStatus.text.toString()
+                val status = etLostFoundManageStatus.selectedItem.toString()
 
                 if (title.isEmpty() || description.isEmpty()) {
                     AlertDialog.Builder(this@LostFoundManageActivity).apply {
@@ -153,32 +166,24 @@ class LostFoundManageActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
 
-                val isCompleted = if (lostfound.isCompleted == 1) 1 else 0
-
-                if (status.isNotEmpty() && (status == "lost" || status == "found")) {
-                    observePutLostFound(lostfound.id, title, description, status, isCompleted)
-                } else {
-                    Toast.makeText(this@LostFoundManageActivity, "Status tidak valid", Toast.LENGTH_SHORT).show()
-                }
+                observePutLostFound(lostfound.id, title, description, status, lostfound.iscompleted)
             }
         }
     }
-
-
 
     private fun observePutLostFound(
         lostfoundId: Int,
         title: String,
         description: String,
         status: String,
-        isCompleted: Int,
+        isCompleted: Boolean,
     ) {
         viewModel.putLostFound(
             lostfoundId,
             title,
             description,
-            isCompleted,
-            status
+            status,
+            isCompleted
         ).observeOnce { result ->
             when (result) {
                 is MyResult.Loading -> {

@@ -1,7 +1,11 @@
 package com.ifs21049.lostandfound.presentation.lostfound
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -88,28 +92,32 @@ class LostFoundDetailActivity : AppCompatActivity() {
     }
 
     private fun loadLostFound(lostfound: LostFoundResponse) {
-        showComponent(true)
+        if (lostfound != null) {
+            showComponent(true)
 
-        binding.apply {
-            tvLostFoundDetailTitle.text = lostfound.title
-            tvLostFoundDetailDate.text = "Dibuat pada: ${lostfound.createdAt}"
-            tvLostFoundDetailDesc.text = lostfound.description
-            tvLostFoundDetailStatus.text = lostfound.status
+            binding.apply {
+                tvLostFoundDetailTitle.text = lostfound.title
+                tvLostFoundDetailDate.text = "Dibuat pada: ${lostfound.createdAt}"
+                tvLostFoundDetailDesc.text = lostfound.description
+//            tvLostFoundDetailStatus.text = lostfound.status
 
-            cbLostFoundDetailIsFinished.isChecked = lostfound.isCompleted == 1
+                cbLostFoundDetailIsFinished.isChecked = lostfound.isCompleted == 1
 
-            cbLostFoundDetailIsFinished.setOnCheckedChangeListener { _, isChecked ->
-                val status = if (lostfound.status is String && (lostfound.status == "lost" || lostfound.status == "found")) lostfound.status else null
+                val statusText = if (lostfound.status.equals("found", ignoreCase = true)) {
+                    highlightText("Found", Color.GREEN)
+                } else {
+                    highlightText("Lost", Color.RED)
+                }
+                // Menetapkan teks status yang sudah disorot ke TextView
+                tvLostFoundDetailStatus.text = statusText
 
-                if (status != null) {
-                    val isCompleted = if (isChecked) 1 else 0
-
+                cbLostFoundDetailIsFinished.setOnCheckedChangeListener { _, isChecked ->
                     viewModel.putLostFound(
                         lostfound.id,
                         lostfound.title,
                         lostfound.description,
-                        isCompleted,
-                        status
+                        lostfound.status,
+                        isChecked
                     ).observeOnce { result ->
                         when (result) {
                             is MyResult.Error -> {
@@ -122,7 +130,8 @@ class LostFoundDetailActivity : AppCompatActivity() {
                             }
 
                             is MyResult.Success -> {
-                                val action = if (isChecked) "Barang berhasil ditemukan" else "Berhasil batal menandai"
+                                val action =
+                                    if (isChecked) "Barang berhasil ditemukan" else "Berhasil batal menandai"
                                 Toast.makeText(
                                     this@LostFoundDetailActivity,
                                     "$action: ${lostfound.title}",
@@ -138,50 +147,58 @@ class LostFoundDetailActivity : AppCompatActivity() {
                         }
                     }
                 }
-            }
 
-            ivLostFoundDetailActionDelete.setOnClickListener {
-                val builder = AlertDialog.Builder(this@LostFoundDetailActivity)
+                ivLostFoundDetailActionDelete.setOnClickListener {
+                    val builder = AlertDialog.Builder(this@LostFoundDetailActivity)
 
-                builder.setTitle("Konfirmasi Hapus Barang")
-                    .setMessage("Anda yakin ingin menghapus barang temuan ini?")
+                    builder.setTitle("Konfirmasi Hapus Barang")
+                        .setMessage("Anda yakin ingin menghapus barang ini?")
 
-                builder.setPositiveButton("Ya") { _, _ ->
-                    observeDeleteLostFound(lostfound.id)
+                    builder.setPositiveButton("Ya") { _, _ ->
+                        observeDeleteLostFound(lostfound.id)
+                    }
+
+                    builder.setNegativeButton("Tidak") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+
+                    val dialog = builder.create()
+                    dialog.show()
                 }
 
-                builder.setNegativeButton("Tidak") { dialog, _ ->
-                    dialog.dismiss()
+                ivLostFoundDetailActionEdit.setOnClickListener {
+                    val delcomLostFound = DelcomLostFound(
+                        lostfound.id,
+                        lostfound.title,
+                        lostfound.description,
+                        lostfound.status,
+                        lostfound.isCompleted == 1,
+                        lostfound.cover
+                    )
+
+                    val intent = Intent(
+                        this@LostFoundDetailActivity,
+                        LostFoundManageActivity::class.java
+                    )
+                    intent.putExtra(LostFoundManageActivity.KEY_IS_ADD, false)
+                    intent.putExtra(LostFoundManageActivity.KEY_LOSTFOUND, delcomLostFound)
+                    launcher.launch(intent)
                 }
-
-                val dialog = builder.create()
-                dialog.show()
             }
-
-            val status = if (lostfound.status is String && (lostfound.status == "lost" || lostfound.status == "found")) lostfound.status else null
-
-            val coverFile: File = lostfound.cover as? File ?: File("") // Ganti "" dengan path file default atau kosong yang sesuai
-
-            val isCompleted = if (lostfound.isCompleted == 1) 1 else null
-            val delcomLostFound = DelcomLostFound(
-                lostfound.id,
-                lostfound.title,
-                lostfound.description,
-                isCompleted,
-                coverFile,
-                status
-            )
-
-            val intent = Intent(
+        } else {
+            Toast.makeText(
                 this@LostFoundDetailActivity,
-                LostFoundManageActivity::class.java
-            )
-            intent.putExtra(LostFoundManageActivity.KEY_IS_ADD, false)
-            intent.putExtra(LostFoundManageActivity.KEY_LOSTFOUND, delcomLostFound)
-            launcher.launch(intent)
+                "Tidak ditemukan item yang dicari",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
+    private fun highlightText(text: String, color: Int): SpannableString {
+        val spannableString = SpannableString(text)
+        spannableString.setSpan(ForegroundColorSpan(color), 0, text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return spannableString
+    }
     private fun observeDeleteLostFound(lostfoundId: Int) {
         showComponent(false)
         showLoading(true)
@@ -193,7 +210,7 @@ class LostFoundDetailActivity : AppCompatActivity() {
                         showLoading(false)
                         Toast.makeText(
                             this@LostFoundDetailActivity,
-                            "Gagal menghapus barang temuan: ${it.error}",
+                            "Gagal menghapus barang: ${it.error}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -203,7 +220,7 @@ class LostFoundDetailActivity : AppCompatActivity() {
 
                         Toast.makeText(
                             this@LostFoundDetailActivity,
-                            "Berhasil menghapus barang temuan",
+                            "Berhasil menghapus barang",
                             Toast.LENGTH_SHORT
                         ).show()
 

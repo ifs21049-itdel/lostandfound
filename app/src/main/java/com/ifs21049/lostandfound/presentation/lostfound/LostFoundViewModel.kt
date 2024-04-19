@@ -34,10 +34,9 @@ class LostFoundViewModel(
         lostfoundId: Int,
         title: String,
         description: String,
-        isCompleted: Int,
-        status: String
+        status: String,
+        isCompleted: Boolean,
     ): LiveData<MyResult<DelcomResponse>> {
-        val status = if (isCompleted == 1) "completed" else "incomplete" // Ubah status berdasarkan nilai isCompleted
         return lostfoundRepository.putLostFound(
             lostfoundId,
             title,

@@ -7,11 +7,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.ifs21049.lostandfound.presentation.main.MainActivity
 import com.ifs21049.lostandfound.data.pref.UserModel
 import com.ifs21049.lostandfound.data.remote.MyResult
 import com.ifs21049.lostandfound.databinding.ActivityLoginBinding
 import com.ifs21049.lostandfound.presentation.ViewModelFactory
-import com.ifs21049.lostandfound.presentation.main.MainActivity
 import com.ifs21049.lostandfound.presentation.register.RegisterActivity
 import kotlinx.coroutines.launch
 

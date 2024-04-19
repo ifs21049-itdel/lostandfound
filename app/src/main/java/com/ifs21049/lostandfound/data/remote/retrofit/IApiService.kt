@@ -31,16 +31,10 @@ interface IApiService {
         @Field("status") status: String?,
     ): DelcomAddLostFoundResponse
 
-    @Multipart
-    @POST("lost-founds/{id}/cover")
-    suspend fun postCoverLostFound(
-        @Part("cover") cover: MultipartBody.Part
-    ): DelcomResponse
-
     @FormUrlEncoded
     @PUT("lost-founds/{id}")
     suspend fun putLostFound(
-        @Path("id") lostfoundId: String,
+        @Path("id") lostfoundId: Int,
         @Field("title") title: String,
         @Field("description") description: String,
         @Query("status") status: String?,
@@ -50,17 +44,17 @@ interface IApiService {
     @GET("lost-founds")
     suspend fun getLostFounds(
         @Query("is_completed") isCompleted: Int?,
-        @Query("is_me") isMe: Int?,
+//        @Query("is_me") isMe: Int?,
         @Query("status") status: String?
     ): DelcomLostFoundsResponse
 
     @GET("lost-founds/{id}")
     suspend fun getLostFound(
-        @Path("id") lostfoundId: String,
+        @Path("id") lostfoundId: Int,
     ): DelcomLostFoundResponse
 
     @DELETE("lost-founds/{id}")
     suspend fun deleteLostFound(
-        @Path("id") lostfoundId: String,
+        @Path("id") lostfoundId: Int,
     ): DelcomResponse
 }

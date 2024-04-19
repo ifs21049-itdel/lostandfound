@@ -54,26 +54,44 @@
                 app:layout_constraintTop_toBottomOf="@+id/etLostFoundManageTitle" />
 
             <TextView
-                android:id="@+id/tvLostFoundManageLabelStatus"
+                android:id="@+id/textView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Status (lost/found)"
+                android:layout_marginBottom="2dp"
+                android:text="Status"
+                app:layout_constraintBottom_toTopOf="@+id/etLostFoundManageStatus"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etLostFoundManageDesc" />
 
-            <EditText
+            <Spinner
                 android:id="@+id/etLostFoundManageStatus"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:drawable/editbox_background"
-                android:ems="10"
-                android:inputType="text"
-                android:padding="12dp"
+                android:entries="@array/status"
+                android:minHeight="48dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+            <ImageView
+                android:id="@+id/ivSelectedImage"
+                android:layout_width="wrap_content"
+                android:layout_height="200sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvLostFoundManageLabelStatus"
-                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+                app:layout_constraintTop_toBottomOf="@+id/etLostFoundManageStatus"
+                tools:srcCompat="@drawable/lostfound" />
+
+            <Button
+                android:id="@+id/btnLostFoundImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Upload Gambar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivSelectedImage" />
 
             <EditText
                 android:id="@+id/etLostFoundManageTitle"
@@ -107,13 +125,14 @@
                 android:id="@+id/btnLostFoundManageSave"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="24dp"
                 android:text="Simpan"
                 android:textSize="14sp"
+                app:cornerRadius="2pt"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etLostFoundManageStatus" />
+                app:layout_constraintTop_toBottomOf="@+id/btnLostFoundImage" />
 
             <ProgressBar
                 android:id="@+id/pbLostFoundManage"

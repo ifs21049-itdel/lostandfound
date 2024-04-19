@@ -44,7 +44,7 @@ class LostFoundRepository private constructor(
         lostfoundId: Int,
         title: String,
         description: String,
-        isCompleted: Int,
+        isCompleted: Boolean,
         status: String
     ): LiveData<MyResult<DelcomResponse>> {
         return flow {
@@ -53,11 +53,11 @@ class LostFoundRepository private constructor(
                 emit(
                     MyResult.Success(
                         apiService.putLostFound(
-                            lostfoundId.toString(), // Ubah menjadi String
+                            lostfoundId,
                             title,
                             description,
                             status,
-                            isCompleted
+                            if (isCompleted) 1 else 0
                         )
                     )
                 )
@@ -76,18 +76,16 @@ class LostFoundRepository private constructor(
 
 
     fun getLostFounds(
-        isFinished: Int?,
+        isCompleted: Int?,
+        isMe: Int?,
+        status: String?,
     ) = flow {
         emit(MyResult.Loading)
         try {
             //get success message
             emit(
                 MyResult.Success(
-                    apiService.getLostFounds(
-                        isCompleted = isFinished,
-                        isMe = null,
-                        status = null
-                    )
+                    apiService.getLostFounds(isCompleted, status)
                 )
             )
         } catch (e: HttpException) {
@@ -111,7 +109,7 @@ class LostFoundRepository private constructor(
             //get success message
             emit(
                 MyResult.Success(
-                    apiService.getLostFound(lostfoundId.toString())
+                    apiService.getLostFound(lostfoundId)
                 )
             )
         } catch (e: HttpException) {
@@ -136,28 +134,9 @@ class LostFoundRepository private constructor(
             //get success message
             emit(
                 MyResult.Success(
-                    apiService.deleteLostFound(lostfoundId.toString())
+                    apiService.deleteLostFound(lostfoundId)
                 )
             )
-        } catch (e: HttpException) {
-            //get error message
-            val jsonInString = e.response()?.errorBody()?.string()
-            emit(
-                MyResult.Error(
-                    Gson()
-                        .fromJson(jsonInString, DelcomResponse::class.java)
-                        .message
-                )
-            )
-        }
-    }
-
-    fun postCoverLostFound(cover: MultipartBody.Part) = flow {
-        emit(MyResult.Loading)
-        try {
-            //get success message
-            val response = apiService.postCoverLostFound(cover)
-            emit(MyResult.Success(response))
         } catch (e: HttpException) {
             //get error message
             val jsonInString = e.response()?.errorBody()?.string()
