@@ -118,25 +118,38 @@ class LostFoundDetailActivity : AppCompatActivity() {
                         lostfound.description,
                         lostfound.status,
                         isChecked
-                    ).observeOnce { result ->
-                        when (result) {
+                    ).observeOnce {
+                        when (it) {
                             is MyResult.Error -> {
-                                val action = if (isChecked) "Menandai" else "Batal menandai"
-                                Toast.makeText(
-                                    this@LostFoundDetailActivity,
-                                    "$action barang temuan: ${lostfound.title}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                if (isChecked) {
+                                    Toast.makeText(
+                                        this@LostFoundDetailActivity,
+                                        "Gagal menyelesaikan data lost and found:  + ${lostfound.title}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        this@LostFoundDetailActivity,
+                                        "Gagal batal menyelesaikan data lost and found: " + lostfound.title,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
 
                             is MyResult.Success -> {
-                                val action =
-                                    if (isChecked) "Barang berhasil ditemukan" else "Berhasil batal menandai"
-                                Toast.makeText(
-                                    this@LostFoundDetailActivity,
-                                    "$action: ${lostfound.title}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                if (isChecked) {
+                                    Toast.makeText(
+                                        this@LostFoundDetailActivity,
+                                        "Berhasil menyelesaikan data lost and found: " + lostfound.title,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        this@LostFoundDetailActivity,
+                                        "Berhasil batal menyelesaikan data lost and found: " + lostfound.title,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
 
                                 if ((lostfound.isCompleted == 1) != isChecked) {
                                     isChanged = true

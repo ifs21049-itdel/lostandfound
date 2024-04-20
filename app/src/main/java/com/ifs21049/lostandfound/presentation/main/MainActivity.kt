@@ -2,6 +2,7 @@ package com.ifs21049.lostandfound.presentation.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.SearchView
 import android.widget.Toast
@@ -87,6 +88,17 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
+                R.id.mainMenuAllData -> {
+                    // Ketika menu "All Data" diklik, panggil fungsi getLostandFounds()
+                    observeGetLostFounds()
+                    true
+                }
+                R.id.mainMenuMyData -> {
+                    // Ketika menu "My Data" diklik, panggil fungsi getLostandFound()
+                    observeGetMyLostFounds()
+                    true
+                }
+
                 else -> false
             }
         }
@@ -126,7 +138,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeGetMyLostFounds() {
+        // Panggil fungsi getLostandFounds() dengan menyertakan nilai isMe
+        viewModel.getLostFound().observe(this) { result ->
+            if (result != null) {
+                when (result) {
+                    is MyResult.Loading -> {
+                        showLoading(true)
+                    }
+                    is MyResult.Success -> {
+                        showLoading(false)
+                        loadLostFoundsToLayout(result.data)
+                    }
+                    is MyResult.Error -> {
+                        showLoading(false)
+                        showEmptyError(true)
+                    }
+                }
+            }
+        }
+    }
+
     private fun loadLostFoundsToLayout(response: DelcomLostFoundsResponse) {
+        if (response == null) {
+            // Handle null case appropriately, misalnya menampilkan pesan error atau melakukan tindakan lainnya
+            Log.e("MainActivity", "response == null")
+            return
+        } else if (response.data == null){
+            Log.e("MainActivity", "response.data == null")
+            return
+        } else if (response.data.lostFounds == null){
+            Log.e("MainActivity", "response.data.lostfounds == null")
+            return
+        }
+
         val lostfounds = response.data.lostFounds
         val layoutManager = LinearLayoutManager(this)
         binding.rvMainLostFounds.layoutManager = layoutManager
@@ -157,8 +202,8 @@ class MainActivity : AppCompatActivity() {
                         lostfound.id,
                         lostfound.title,
                         lostfound.description,
-                        isCompleted,
-                        lostfound.status
+                        lostfound.status,
+                        isCompleted
                     ).observeOnce {
                         when (it) {
                             is MyResult.Error -> {

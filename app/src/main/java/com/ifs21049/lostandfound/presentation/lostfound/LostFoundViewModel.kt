@@ -9,7 +9,6 @@ import com.ifs21049.lostandfound.data.remote.response.DelcomLostFoundResponse
 import com.ifs21049.lostandfound.data.remote.response.DelcomResponse
 import com.ifs21049.lostandfound.data.repository.LostFoundRepository
 import com.ifs21049.lostandfound.presentation.ViewModelFactory
-
 class LostFoundViewModel(
     private val lostfoundRepository: LostFoundRepository
 ) : ViewModel() {
@@ -41,13 +40,10 @@ class LostFoundViewModel(
             lostfoundId,
             title,
             description,
+            status,
             isCompleted,
-            status
-        )
+        ).asLiveData()
     }
-
-
-
 
     fun deleteLostFound(lostfoundId: Int): LiveData<MyResult<DelcomResponse>> {
         return lostfoundRepository.deleteLostFound(lostfoundId).asLiveData()
