@@ -18,5 +18,9 @@
             android:id="@+id/mainMenuMyData"
             android:title="My Data"
             app:showAsAction="never" />
+        <item
+            android:id="@+id/mainMenuFavoriteTodos"
+            android:title="Favorite LostFounds"
+            app:showAsAction="never" />
     </group>
 </menu>
