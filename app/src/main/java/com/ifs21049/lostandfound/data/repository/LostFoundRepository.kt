@@ -149,6 +149,27 @@ class LostFoundRepository private constructor(
         }
     }
 
+    fun addCoverLostFound(
+        lostfoundId: Int,
+        cover: MultipartBody.Part,
+    ) = flow {
+        emit(MyResult.Loading)
+        try {
+            //get success message
+            emit(MyResult.Success(apiService.addCoverLostFound(lostfoundId, cover)))
+        } catch (e: HttpException) {
+            //get error message
+            val jsonInString = e.response()?.errorBody()?.string()
+            emit(
+                MyResult.Error(
+                    Gson()
+                        .fromJson(jsonInString, DelcomResponse::class.java)
+                        .message
+                )
+            )
+        }
+    }
+
     companion object {
         @Volatile
         private var INSTANCE: LostFoundRepository? = null

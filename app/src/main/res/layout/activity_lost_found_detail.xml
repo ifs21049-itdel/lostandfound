@@ -40,14 +40,14 @@
                 android:paddingBottom="12dp">
 
                 <ImageView
-                    android:id="@+id/tvLostFoundDetailImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="200sp"
+                    android:id="@+id/ivLostFoundDetailCover"
+                    android:layout_width="0dp"
+                    android:layout_height="160dp"
+                    android:background="#F7F8FA"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:srcCompat="@drawable/lostfound" />
+                    android:src="@drawable/ic_image_24" />
 
                 <CheckBox
                     android:id="@+id/cbLostFoundDetailIsFinished"
@@ -60,7 +60,7 @@
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@+id/tvLostFoundDetailTitle"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvLostFoundDetailImage" />
+                    app:layout_constraintTop_toBottomOf="@+id/ivLostFoundDetailCover" />
 
                 <TextView
                     android:id="@+id/tvLostFoundDetailTitle"
@@ -73,7 +73,7 @@
                     android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/cbLostFoundDetailIsFinished"
-                    app:layout_constraintTop_toBottomOf="@+id/tvLostFoundDetailImage" />
+                    app:layout_constraintTop_toBottomOf="@+id/ivLostFoundDetailCover" />
                 <TextView
                     android:id="@+id/tvLostFoundDetailDate"
                     android:layout_width="0dp"
