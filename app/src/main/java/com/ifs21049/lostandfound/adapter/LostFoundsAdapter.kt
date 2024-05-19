@@ -36,16 +36,7 @@ class LostFoundsAdapter :
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val data = originalData[originalData.indexOf(getItem(position))]
 
-        holder.binding.cbItemLostFoundIsFinished.setOnCheckedChangeListener(null)
-        holder.binding.cbItemLostFoundIsFinished.setOnLongClickListener(null)
-
         holder.bind(data)
-
-        holder.binding.cbItemLostFoundIsFinished.setOnCheckedChangeListener { _, isChecked ->
-            data.isCompleted = if (isChecked) 1 else 0
-            holder.bind(data)
-            onItemClickCallback.onCheckedChangeListener(data, isChecked)
-        }
 
         holder.binding.ivItemLostFoundDetail.setOnClickListener {
             onItemClickCallback.onClickDetailListener(data.id)
@@ -58,7 +49,6 @@ class LostFoundsAdapter :
         fun bind(data: LostFoundsItemResponse) {
             binding.apply {
                 tvItemLostFoundTitle.text = data.title
-                cbItemLostFoundIsFinished.isChecked = data.isCompleted == 1
 
                 val statusText = if (data.status.equals("found", ignoreCase = true)) {
                     highlightText("Found", Color.GREEN)
